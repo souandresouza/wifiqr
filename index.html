@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de QR Code Wi-Fi</title>
+  <style>
+    /* Estilos Globais */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden; /* Remove barras de rolagem */
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 90vw; /* Limita a largura máxima */
+      max-height: 90vh; /* Limita a altura máxima */
+      width: 100%;
+      text-align: center;
+      overflow-y: auto; /* Permite rolagem interna apenas no container, se necessário */
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    /* Tema Claro */
+    body.light-theme {
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    body.light-theme .container {
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tema Escuro */
+    body.dark-theme {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-theme .container {
+      background-color: #1e1e1e;
+      box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Campos de Entrada */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .input-group input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    body.light-theme .input-group input {
+      background-color: #fff;
+      color: #333;
+    }
+
+    body.dark-theme .input-group input {
+      background-color: #333;
+      color: #e0e0e0;
+    }
+
+    .input-group input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    /* Botão */
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* QR Code */
+    .qr-code {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qr-code img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+    }
+
+    /* Responsividade */
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .input-group {
+        flex: 1;
+      }
+
+      .qr-code {
+        flex: 1;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="input-group">
+      <h1>Gerador de QR Code Wi-Fi</h1>
+      <input type="text" id="ssid" placeholder="Nome da Rede (SSID)" />
+      <input type="password" id="password" placeholder="Senha da Rede" />
+      <button onclick="generateQRCode()">Gerar QR Code</button>
+    </div>
+    <div class="qr-code">
+      <h2>QR Code</h2>
+      <div id="qrcode-container"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    // Função para alternar tema com base na hora do sistema
+    function toggleTheme() {
+      const hour = new Date().getHours();
+      const isLightTheme = hour >= 6 && hour < 18;
+      document.body.className = isLightTheme ? 'light-theme' : 'dark-theme';
+    }
+
+    // Função para gerar o QR Code
+    function generateQRCode() {
+      const ssid = document.getElementById('ssid').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!ssid || !password) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+      }
+
+      const wifiData = `WIFI:T:WPA;S:${ssid};P:${password};;`;
+      const qrcodeContainer = document.getElementById('qrcode-container');
+      qrcodeContainer.innerHTML = ''; // Limpa o container
+
+      QRCode.toCanvas(wifiData, { width: 200 }, (error, canvas) => {
+        if (error) {
+          console.error(error);
+          alert('Erro ao gerar o QR Code.');
+          return;
+        }
+        qrcodeContainer.appendChild(canvas);
+      });
+    }
+
+    // Inicializa o tema ao carregar a página
+    toggleTheme();
+  </script>
+</body>
+</html>
